@@ -15,7 +15,7 @@ private protocol EncodableFlag {
 
 extension Flag: EncodableFlag where Value: Encodable {
     
-    fileprivate func encodeValue(from container: inout Container) throws {
+     fileprivate func encodeValue(from container: inout Container) throws {
         
         let key = FlagCodingKey(name: name)
         
@@ -23,13 +23,19 @@ extension Flag: EncodableFlag where Value: Encodable {
     }
 }
 
-extension FeatureFlags: Encodable {
-    
+
+extension FeatureFlags: Codable {}
+extension FeatureFlags: CadableModel {
+    init(from decoder: Decoder) throws {
+        try deco(decoder: decoder)
+    }
+}
+extension CadableModel where Self: Encodable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: FlagCodingKey.self)
-        
+
         for child in Mirror(reflecting: self).children {
-            
+
             guard let flag = child.value as? EncodableFlag else {
                 continue
             }

@@ -45,7 +45,7 @@ private protocol DecodableFlag {
 }
 
 extension Flag: DecodableFlag where Value: Decodable {
-    fileprivate func decodeValue(from container: Container) throws {
+     fileprivate func decodeValue(from container: Container) throws {
         // This enables us to pass an override using a command line
         // argument matching the flag's name:
         if let value = UserDefaults.standard.value(forKey: name) {
@@ -66,20 +66,21 @@ extension Flag: DecodableFlag where Value: Decodable {
     }
 }
 
-extension FeatureFlags: Decodable {
-    init(from decoder: Decoder) throws {
+protocol CadableModel {
+    init(from decoder: Decoder) throws
+}
+extension CadableModel where Self: Decodable {
+    
+    func deco(decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: FlagCodingKey.self)
-
         for child in Mirror(reflecting: self).children {
             guard let flag = child.value as? DecodableFlag else {
                 continue
             }
-
             try flag.decodeValue(from: container)
         }
     }
 }
-
 
 struct FeatureFlags {
     @Flag(name: "feature-search", defaultValue: false)
